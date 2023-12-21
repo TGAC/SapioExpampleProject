@@ -14,6 +14,9 @@ class SapioClient:
     """
 
     def __init__(self):
+        """
+        Initializes a new instance of the SapioClient class.
+        """
         self.url = os.getenv('SAPIOURL')
         self.api_token = os.getenv('SAPIOTOKEN')
         self.guid = os.getenv('SAPIOGUID')
@@ -44,5 +47,80 @@ class SapioClient:
         else:
             return json.loads(resp.text)
         
+    def do_post(self, method, dataType, params={}):
+        """
+        Sends a POST request to the Sapio API.
 
-    
+        Args:
+            method (str): The API method to call.
+            dataType (str): The data type for the API method.
+            params (dict): Optional parameters for the API method.
+
+        Returns:
+            dict: The JSON response from the API.
+
+        Raises:
+            Exception: If the API returns an error status code.
+        """
+        if method.startswith('/'):
+            url = self.url + method
+        else:
+            url = self.url + '/' + method
+        url = url + "/" + dataType
+        resp = self.session.post(url, json=params)
+        if resp.status_code != 200:
+            raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
+        else:
+            return json.loads(resp.text)
+
+    def do_put(self, method, _id, params={}):
+        """
+        Sends a PUT request to the Sapio API.
+
+        Args:
+            method (str): The API method to call.
+            _id (int): The ID of the record to update.
+            params (dict): Optional parameters for the API method.
+
+        Returns:
+            dict: The JSON response from the API.
+
+        Raises:
+            Exception: If the API returns an error status code.
+        """
+        if method.startswith('/'):
+            url = self.url + method
+        else:
+            url = self.url + '/' + method
+        params['recordId'] = _id
+        resp = self.session.put(url, json=[{'recordId': _id, 'dataTypeName': 'Sample', 'fields': params}])
+        if resp.status_code != 204:
+            raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
+        else:
+            return True
+
+    def do_delete(self, method, params={}, _id=None):
+        """
+        Sends a DELETE request to the Sapio API.
+
+        Args:
+            method (str): The API method to call.
+            params (dict): Optional parameters for the API method.
+            _id (int): The ID of the record to delete.
+
+        Returns:
+            dict: The JSON response from the API.
+
+        Raises:
+            Exception: If the API returns an error status code.
+        """
+        if method.startswith('/'):
+            url = self.url + method
+        else:
+            url = self.url + '/' + method
+        url = url + '/' + params["dataTypeName"] + '/' + str(params["recordId"])
+        resp = self.session.delete(url)
+        if resp.status_code != 204:
+            raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
+        else:
+            return True
