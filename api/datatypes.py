@@ -73,7 +73,7 @@ class DataType():
         Returns:
             dict: The response indicating the success of the deletion.
         """
-        return self.sc.do_delete(method='/datarecord', params={"dataTypeName": self.data_type, "recordId": _id})
+        return self.sc.do_delete(method='/datarecord', params={"dataTypeName": self.data_type}, _id=_id)
 
 
 class Sample(DataType):

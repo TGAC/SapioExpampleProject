@@ -118,7 +118,7 @@ class SapioClient:
             url = self.url + method
         else:
             url = self.url + '/' + method
-        url = url + '/' + params["dataTypeName"] + '/' + str(params["recordId"])
+        url = url + '/' + params["dataTypeName"] + '/' + str(_id)
         resp = self.session.delete(url)
         if resp.status_code != 204:
             raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)

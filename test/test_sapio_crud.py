@@ -37,7 +37,36 @@ class TestSample(unittest.TestCase):
             #print("Delete")
             assert Sample().delete(_id=recordId)
 
-
+class TestProject(unittest.TestCase):
+    def test_crud(self):
+        """
+        This method tests the CRUD (Create, Read, Update, Delete) operations of the Project class.
+        """
+        recordId = None
+        updated_project_id = 'XYZ123'
+        with self.subTest():
+            #print("Create")
+            defin = Project().get_type_definintion()
+            assert type(defin) == dict
+            assert defin["dataTypeName"] == "Project"
+            assert defin["dataTypeId"] == 142
+            t_project = Project().create(data={"name": "test_project", "description": "test_project_description"})
+            assert type(t_project) == dict
+            assert t_project["dataTypeName"] == "Project"
+            assert type(t_project["recordId"]) == int
+            recordId = t_project["recordId"]
+        with self.subTest():
+            #print("Update")
+            assert Project().update(_id=recordId, data={"ProjectId": updated_project_id})
+        with self.subTest():
+            #print("Read")
+            t_project = Project().read(_id=recordId)
+            assert type(t_project) == dict
+            assert t_project["dataTypeName"] == "Project"
+            assert t_project["fields"]["ProjectId"] == updated_project_id
+        with self.subTest():
+            #print("Delete")
+            assert Project().delete(_id=recordId)
 
 if __name__ == '__main__':
     unittest.main()
