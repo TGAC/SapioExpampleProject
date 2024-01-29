@@ -42,6 +42,7 @@ class SapioClient:
         else:
             url = self.url + '/' + method
         resp = self.session.get(url, params=params)
+        print(url)
         if resp.status_code != 200:
             raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
         else:
@@ -67,6 +68,7 @@ class SapioClient:
         else:
             url = self.url + '/' + method
         url = url + "/" + dataType
+        print(url)
         resp = self.session.post(url, json=params)
         if resp.status_code != 200:
             raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
@@ -92,6 +94,7 @@ class SapioClient:
             url = self.url + method
         else:
             url = self.url + '/' + method
+        print(url)    
         params['recordId'] = _id
         resp = self.session.put(url, json=[{'recordId': _id, 'dataTypeName': 'Sample', 'fields': params}])
         if resp.status_code != 204:

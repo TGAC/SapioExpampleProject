@@ -1,4 +1,6 @@
-from utils.sapioclient import SapioClient as client
+from edp_utils.sapioclient import SapioClient as client
+from edp_utils.sapio_datamanager import Sapio
+from sapiopylib.rest.pojo.DataRecord import DataRecord
 
 
 class DataType():
@@ -11,11 +13,13 @@ class DataType():
     """
 
     def __init__(self):
+        
         """
         Initializes a new instance of the DataType class.
         """
         self.sc = client()
         self.data_type = None
+
 
     def get_type_definintion(self):
         """
@@ -36,7 +40,9 @@ class DataType():
         Returns:
             dict: The created data record.
         """
-        return self.sc.do_post(method='/datarecord', dataType=self.data_type, params=data)
+        samples = Sapio().dataRecordManager.add_data_records_with_data(data_type_name=self.data_type, field_map_list=[data])
+        return samples[0] if len(samples)>0 else None
+        #return self.sc.do_post(method='/datarecord', dataType=self.data_type, params=data)
 
     def read(self, _id):
         """
@@ -48,7 +54,8 @@ class DataType():
         Returns:
             dict: The retrieved data record.
         """
-        return self.sc.do_get(method='/datarecord', params={"dataTypeName": self.data_type, "recordId": _id})
+        #return self.sc.do_get(method='/datarecord', params={"dataTypeName": self.data_type, "recordId": _id})
+        return Sapio().dataRecordManager.query_system_for_record(data_type_name=self.data_type, record_id=_id)
 
     def update(self, _id, data):
         """
@@ -61,7 +68,10 @@ class DataType():
         Returns:
             dict: The updated data record.
         """
-        return self.sc.do_put(method='/datarecordlist/fields', _id=_id, params=data)
+        #return self.sc.do_put(method='/datarecordlist/fields', _id=_id, params=data)
+        data_record = self.read(_id=_id)
+        data_record.set_fields(data)
+        Sapio().dataRecordManager.commit_data_records(records_to_update= [data_record])
 
     def delete(self, _id):
         """
@@ -73,8 +83,9 @@ class DataType():
         Returns:
             dict: The response indicating the success of the deletion.
         """
-        return self.sc.do_delete(method='/datarecord', params={"dataTypeName": self.data_type}, _id=_id)
-
+        #return self.sc.do_delete(method='/datarecord', params={"dataTypeName": self.data_type}, _id=_id)
+        data_record = DataRecord(data_type_name=self.data_type, record_id=_id, fields=[])
+        Sapio().dataRecordManager.delete_data_record(record=data_record)
 
 class Sample(DataType):
     """
