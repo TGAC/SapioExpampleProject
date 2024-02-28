@@ -73,7 +73,7 @@ class DataType():
         data_record.set_fields(data)
         Sapio().dataRecordManager.commit_data_records(records_to_update= [data_record])
 
-    def delete(self, _id):
+    def delete(self, _id, recursive_delete=False):
         """
         Deletes a specific data record.
 
@@ -85,7 +85,37 @@ class DataType():
         """
         #return self.sc.do_delete(method='/datarecord', params={"dataTypeName": self.data_type}, _id=_id)
         data_record = DataRecord(data_type_name=self.data_type, record_id=_id, fields=[])
-        Sapio().dataRecordManager.delete_data_record(record=data_record)
+        Sapio().dataRecordManager.delete_data_record(record=data_record, recursive_delete=recursive_delete)
+
+    def create_childern(self, _id, child_count, child_type, params=None):
+        """
+        Create a nunmber of children with specific data record.
+
+        Args:
+            _id (str): The ID of the data record.
+            child_count: The nunber of children to create
+            child_type: The type of children to create
+            
+        Returns:
+            dict: The children created
+        """
+        children = self.sc.do_post(method='/datarecord/children/{dataTypeName}/{recordId}', method_params={"dataTypeName":self.data_type, "recordId":_id}, 
+                         url_params={"childTypeName":child_type, "numberToAdd": child_count }, params=params )
+        return children
+
+    def add_childern(self, _id, params=None):
+        """
+        Add a nunmber of existing children
+
+        Args:
+            _id (str): The ID of the data record.
+
+        Returns:
+            dict: the response indicating the success of the addition
+        """        
+        return self.sc.do_put(method='/datarecord/children/{dataTypeName}/{recordId}', method_params={"dataTypeName":self.data_type, "recordId":_id}, 
+                           params=params )
+ 
 
 class Sample(DataType):
     """
@@ -115,3 +145,31 @@ class Project(DataType):
         """
         super().__init__()
         self.data_type = "Project"
+
+class Request(DataType):
+    """
+    Represents a project data type.
+
+    Inherits from the DataType class.
+    """
+
+    def __init__(self):
+        """
+        Initializes a new instance of the Project class.
+        """
+        super().__init__()
+        self.data_type = "Request"
+
+class AssignedProcess(DataType):
+    """
+    Represents a project data type.
+
+    Inherits from the DataType class.
+    """
+
+    def __init__(self):
+        """
+        Initializes a new instance of the Project class.
+        """
+        super().__init__()
+        self.data_type = "AssignedProcess"    

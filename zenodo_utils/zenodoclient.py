@@ -1,9 +1,8 @@
 import requests
 import json
 import os
-import urllib
 
-class SapioClient:
+class ZenodoClient:
     """
     A client for interacting with the Sapio API.
 
@@ -18,12 +17,11 @@ class SapioClient:
         """
         Initializes a new instance of the SapioClient class.
         """
-        self.url = os.getenv('SAPIOURL')
-        self.api_token = os.getenv('SAPIOTOKEN')
-        self.guid = os.getenv('SAPIOGUID')
+        self.url = os.getenv('ZENODOURL')
+        self.api_token = os.getenv('ZENODOTOKEN')
         self.session = requests.Session()
-        self.session.headers = {'X-APP-KEY': self.guid, 'X-API-TOKEN': self.api_token}
-
+        self.session.headers = {"Authorization": f"Bearer {self.api_token}"}
+        
     def do_get(self, method, url_params={}):
         """
         Sends a GET request to the Sapio API.
@@ -49,7 +47,7 @@ class SapioClient:
         else:
             return json.loads(resp.text)
         
-    def do_post(self, method, method_params={}, url_params={}, params=None):
+    def do_post(self, method, method_params={}, url_params={}, params=None, files=None):
         """
         Sends a POST request to the Sapio API.
 
@@ -70,8 +68,8 @@ class SapioClient:
         else:
             url = self.url + '/' + final_method       
         print(url)
-        resp = self.session.post(url=url, params=url_params, json= params )
-        if resp.status_code >= 400:
+        resp = self.session.post(url=url, params=url_params, json=params, files=files )
+        if  resp.status_code >= 400:
             raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
         else:
             return json.loads(resp.text)
@@ -99,10 +97,10 @@ class SapioClient:
  
         print(url)  
         resp = self.session.put(url=url, params=url_params, json=params  )
-        if resp.status_code != 204:
+        if resp.status_code >= 400:
             raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
         else:
-            return True
+            return json.loads(resp.text)
 
     def do_delete(self, method, method_params={}, url_params={}):
         """
@@ -127,7 +125,7 @@ class SapioClient:
    
         print(url)  
         resp = self.session.delete(url=url, params=url_params)
-        if resp.status_code != 204:
+        if resp.status_code >= 400:
             raise Exception('Error: ' + str(resp.status_code) + ' ' + resp.text)
         else:
             return True
